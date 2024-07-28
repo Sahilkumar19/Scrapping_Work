@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon Scraper</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Custom CSS for Circular Progress Bar -->
+    <style>
+        .progress-circle {
+            width: 120px;
+            height: 120px;
+            background-color: transparent;
+            border: 8px solid #f3f3f3;
+            border-radius: 50%;
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            z-index: 10;
+        }
+
+        .progress-circle::before {
+            content: '';
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            border: 8px solid #3498db;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            clip: rect(0, 60px, 120px, 0);
+        }
+
+        .progress-circle::after {
+            content: '';
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            border: 8px solid #3498db;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            clip: rect(0, 120px, 120px, 60px);
+        }
+
+        .percentage-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+            color: #3498db;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="{{ url_for('static', filename='image/logo.png') }}" alt="Moglix Logo" height="40">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Services</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Signup</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h1 class="text-center">Amazon Scraper</h1>
+        <p class="lead text-center">This is a tool to scrape product data from Amazon.</p>
+        <div class="alert alert-info mt-3 position-relative" role="alert">
+            <strong>Instructions:</strong>
+            <ol>
+                <li>Enter Amazon product URLs or ASINs in the textarea.</li>
+                <li>You can enter each URL on a new line or separate them by spaces.</li>
+                <li>Click the "Scrape Products" button to start scraping.</li>
+                <li>Wait for the scraping process to complete.</li>
+                <li>If successful, you can download the scraped data in CSV format.</li>
+            </ol>
+            <!-- Circular Progress Bar -->
+            <div class="progress-circle">
+                <div class="percentage-text" id="percentageText">0%</div>
+            </div>
+        </div>
+        <form method="post" class="mt-3" id="scrapeForm">
+            <div class="form-group">
+                <label for="productUrls">Product URLs / ASINs:</label>
+                <textarea name="urls" id="productUrls" class="form-control" rows="10" cols="50"
+                    placeholder="Enter each URL or ASIN on a new line or separated by spaces" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Scrape Products</button>
+        </form>
+    </div>
+
+    <footer class="footer bg-dark text-white mt-5 py-4">
+        <div class="container text-center">
+            <div class="social-icons mb-3">
+                <a href="#" class="text-white mr-2"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="text-white mr-2"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="text-white mr-2"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="text-white mr-2"><i class="fab fa-linkedin"></i></a>
+            </div>
+            <p>&copy; 2024 Moglix. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        // JavaScript to update progress bar values
+        $('#scrapeForm').submit(function () {
+            var urls = $('#productUrls').val().trim().split(/\s+/);
+            var urlsCount = urls.length;
+            var scrapedCount = 0;
+            var percentageText = $('#percentageText');
+            var totalProcessingTime = 0;
+
+            // Function to simulate scraping process
+            function simulateScraping() {
+                // Simulate scraping for demonstration
+                urls.forEach(function (url) {
+                    var processingTime = Math.floor(Math.random() * 3000) +                    1000; // Random processing time between 1 to 3 seconds
+                    totalProcessingTime += processingTime;
+                    setTimeout(function () {
+                        scrapedCount++;
+                        var percent = Math.round((scrapedCount / urlsCount) * 100);
+                        percentageText.text(percent + '%');
+                        if (scrapedCount === urlsCount) {
+                            clearInterval(interval);
+                        }
+                    }, totalProcessingTime);
+                });
+            }
+
+            // Call the function to start scraping
+            simulateScraping();
+
+            return true; // Continue with form submission
+        });
+    </script>
+</body>
+</html>
